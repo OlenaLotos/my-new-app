@@ -5,10 +5,12 @@ import {
   View,
   TextInput,
   ImageBackground,
-  Button,
+  TouchableOpacity,
+  Platform,
 } from "react-native";
 
 export default function App() {
+  console.log(Platform.OS);
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -18,17 +20,36 @@ export default function App() {
         {/* <View style={styles.background}> */}
         <Text style={styles.header}>Реєстрація </Text>
         <View style={styles.form}>
-          <TextInput style={styles.input} />
-          <TextInput style={styles.input} />
-          <TextInput style={styles.input} />
-          <Button
-            style={styles.button}
-            title="Зареєструватись"
-            color={"#FF6C00"}
-          />
+          <View style={{ marginBottom: 16 }}>
+            <TextInput
+              style={styles.input}
+              textAlign="left"
+              placeholder="Логін"
+            />
+          </View>
+          <View style={{ marginBottom: 16 }}>
+            <TextInput
+              style={styles.input}
+              textAlign="left"
+              placeholder="Адреса електронної пошти"
+            />
+          </View>
+          <View style={{ marginBottom: 43 }}>
+            <TextInput
+              style={styles.input}
+              textAlign="left"
+              secureTextEntry={true}
+              placeholder="Пароль"
+            />
+          </View>
+          <View style={styles.button}>
+            <TouchableOpacity activeOpacity={0.8} style={styles.button}>
+              <Text style={styles.btnTitle}>Зареєструватись</Text>
+            </TouchableOpacity>
+          </View>
           <StatusBar style="auto" />
-          {/* </View> */}
         </View>
+        {/* </View> */}
       </ImageBackground>
     </View>
   );
@@ -44,6 +65,7 @@ const styles = StyleSheet.create({
   image: {
     flex: 1,
     resizeMode: "cover",
+    // justifyContent: "flex-end",
     justifyContent: "center",
   },
   background: {
@@ -61,9 +83,8 @@ const styles = StyleSheet.create({
     height: 50,
     width: 343,
     color: "#212121",
-    textAlign: "left",
     padding: 16,
-    marginBottom: 16,
+    textAlign: "left",
   },
   header: {
     // fontFamily: "Roboto",
@@ -81,8 +102,24 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   button: {
-    // color: "#FFFFFF",
+    height: 51,
+    justifyContent: "center",
+    alignItems: "center",
+    color: "#FFFFFF",
     borderRadius: 100,
-    height: 100,
+    // backgroundColor: "#FF6C00",
+    // ...Platform.select({
+    //   ios: { backgroundColor: "transparent" },
+    //   android: { backgroundColor: "#FF6C00" },
+    // }),
+    backgroundColor: Platform.OS === "ios" ? "transparent" : "#FF6C00",
+    // borderWidth: 1,
+    // borderColor: Platform.OS === "ios" ? "transparenr" : "transparenr",
+  },
+  btnTitle: {
+    fontWeight: 400,
+    fontSize: 16,
+    lineHeight: 1.18,
+    color: "#FFFFFF",
   },
 });
