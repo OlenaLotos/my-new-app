@@ -14,8 +14,6 @@ import {
   TouchableWithoutFeedback,
   Dimensions,
 } from "react-native";
-import * as Font from "expo-font";
-import Apploading from "expo-app-loading";
 
 const initialState = {
   login: "",
@@ -23,18 +21,11 @@ const initialState = {
   password: "",
 };
 
-const loadApplication = async () => {
-  await Font.loadAsync({
-    "Roboto-Regular": require("../assets/fonts/Roboto-Regular.ttf"),
-    "Roboto-Medium": require("../assets/fonts/Roboto-Medium.ttf"),
-  });
-};
-
-export default function RegistrationScreen() {
+export default function RegistrationScreen({ navigation }) {
   console.log(Platform.OS);
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [state, setState] = useState(initialState);
-  const [isReady, setIsReady] = useState(false);
+
   const [dimensions, setDimensions] = useState(Dimensions.get("window").width);
 
   useEffect(() => {
@@ -54,16 +45,6 @@ export default function RegistrationScreen() {
     console.log(state);
     setState(initialState);
   };
-
-  if (!isReady) {
-    return (
-      <Apploading
-        startAsync={loadApplication}
-        onFinish={() => setIsReady(true)}
-        onError={console.warn}
-      />
-    );
-  }
 
   return (
     <TouchableWithoutFeedback onPress={keyboardHide}>
@@ -141,7 +122,11 @@ export default function RegistrationScreen() {
                 />
               </View>
               <View style={{ padding: 16 }}>
-                <Button color={"#1B4371"} title="У вас вже є акаунт? Увійти" />
+                <Button
+                  onPress={() => navigation.navigate("Login")}
+                  color={"#1B4371"}
+                  title="У вас вже є акаунт? Увійти"
+                />
               </View>
             </View>
           </TouchableWithoutFeedback>
