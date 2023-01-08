@@ -1,16 +1,11 @@
 import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View } from "react-native";
-import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
+
 import Apploading from "expo-app-loading";
 import * as Font from "expo-font";
-
-import LoginScreen from "./Screens/LoginScreen";
-import RegistrationScreen from "./Screens/RegistrationScreen";
-import Home from "./Screens/Home";
-
-const MainStack = createStackNavigator();
+import { useRoute } from "./router";
 
 const loadApplication = async () => {
   await Font.loadAsync({
@@ -21,7 +16,7 @@ const loadApplication = async () => {
 
 export default function App() {
   const [isReady, setIsReady] = useState(false);
-
+  const routing = useRoute({});
   if (!isReady) {
     return (
       <Apploading
@@ -33,25 +28,7 @@ export default function App() {
   }
   return (
     <View style={styles.container}>
-      <NavigationContainer>
-        <MainStack.Navigator>
-          <MainStack.Screen
-            options={{ headerShown: false }}
-            name="Login"
-            component={LoginScreen}
-          />
-          <MainStack.Screen
-            options={{ headerShown: false }}
-            name="Registration"
-            component={RegistrationScreen}
-          />
-          <MainStack.Screen
-            name="Home"
-            component={Home}
-            options={{ title: "Start screen" }}
-          />
-        </MainStack.Navigator>
-      </NavigationContainer>
+      <NavigationContainer>{routing}</NavigationContainer>
       <StatusBar style="auto" />
     </View>
   );
