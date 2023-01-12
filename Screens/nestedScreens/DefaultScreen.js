@@ -4,7 +4,7 @@ import { View, StyleSheet, FlatList, Image, Button } from "react-native";
 
 export default function DefaultScreenPosts({ route, navigation }) {
   const [posts, setPosts] = useState([]);
-  console.log("route.params", route.params);
+  //   console.log("route.params", route.params);
 
   useEffect(() => {
     if (route.params) {

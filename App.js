@@ -3,9 +3,12 @@ import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 
+import { Provider } from "react-redux";
+
 import Apploading from "expo-app-loading";
 import * as Font from "expo-font";
 import { useRoute } from "./router";
+import { store } from "./redux/store";
 
 const loadApplication = async () => {
   await Font.loadAsync({
@@ -16,7 +19,7 @@ const loadApplication = async () => {
 
 export default function App() {
   const [isReady, setIsReady] = useState(false);
-  const routing = useRoute({});
+  const routing = useRoute(false);
   if (!isReady) {
     return (
       <Apploading
@@ -28,7 +31,9 @@ export default function App() {
   }
   return (
     <View style={styles.container}>
-      <NavigationContainer>{routing}</NavigationContainer>
+      <Provider store={store}>
+        <NavigationContainer>{routing}</NavigationContainer>
+      </Provider>
       <StatusBar style="auto" />
     </View>
   );

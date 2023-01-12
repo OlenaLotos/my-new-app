@@ -15,6 +15,10 @@ import {
   Dimensions,
 } from "react-native";
 
+import { useDispatch } from "react-redux";
+
+import { authSighUpUser } from "../redux/auth/authOperations";
+
 const initialState = {
   login: "",
   email: "",
@@ -25,8 +29,9 @@ export default function RegistrationScreen({ navigation }) {
   console.log(Platform.OS);
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [state, setState] = useState(initialState);
-
   const [dimensions, setDimensions] = useState(Dimensions.get("window").width);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const onChange = () => {
@@ -39,15 +44,15 @@ export default function RegistrationScreen({ navigation }) {
     };
   }, []);
 
-  const keyboardHide = () => {
+  const handleSubmit = () => {
     setIsShowKeyboard(false);
     Keyboard.dismiss();
-    console.log(state);
+    dispatch(authSighUpUser(state));
     setState(initialState);
   };
 
   return (
-    <TouchableWithoutFeedback onPress={keyboardHide}>
+    <TouchableWithoutFeedback onPress={handleSubmit}>
       <ImageBackground
         style={styles.image}
         source={require("../images/backgraund.png")}
@@ -55,7 +60,7 @@ export default function RegistrationScreen({ navigation }) {
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
-          <TouchableWithoutFeedback onPress={keyboardHide}>
+          <TouchableWithoutFeedback onPress={handleSubmit}>
             <View
               style={{
                 ...styles.container,
@@ -115,7 +120,7 @@ export default function RegistrationScreen({ navigation }) {
                 }}
               >
                 <Button
-                  onPress={keyboardHide}
+                  onPress={handleSubmit}
                   style={styles.button}
                   color={"#fff"}
                   title="Зареєструватись"

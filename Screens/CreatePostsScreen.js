@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, Image, TextInput, Button } from "react-native";
 import { Camera, CameraType } from "expo-camera";
 import { TouchableOpacity } from "react-native-gesture-handler";
-// import * as Location from "expo-location";
+import * as Location from "expo-location";
 import { Feather } from "@expo/vector-icons";
 
 const initialState = {
@@ -16,11 +16,16 @@ export default function CreatePostsScreen({ navigation }) {
   const [camera, setCamera] = useState(null);
   const [photo, setPhoto] = useState("");
   const [type, setType] = useState(CameraType.back);
+  const [location, setLocation] = useState(null);
 
   const takePhoto = async () => {
     const photo = await camera.takePictureAsync();
-    // const location = await Location.getCurrentPositionAsync({});
-
+    const location = await Location.getCurrentPositionAsync({});
+    const coords = {
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+    };
+    setLocation(coords);
     setPhoto(photo.uri);
     setState((prevState) => ({ ...prevState, photo: photo.uri }));
     // console.log("location", location.latitude);
