@@ -1,31 +1,41 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Image, Button } from "react-native";
-import { Camera } from "expo-camera";
+import { Camera, CameraType } from "expo-camera";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import * as Location from "expo-location";
 
 export default function CreatePostsScreen({ navigation }) {
   const [camera, setCamera] = useState(null);
   const [photo, setPhoto] = useState("");
+  const [type, setType] = useState(CameraType.back);
 
   const takePhoto = async () => {
     const photo = await camera.takePictureAsync();
+    const location = await Location.getCurrentPositionAsync({});
 
     setPhoto(photo.uri);
+    console.log("location", location.latitude);
     console.log(photo);
   };
 
   const sendPhoto = async () => {
-    navigation.navigate("Posts", { photo });
+    navigation.navigate("DefaultScreen", { photo });
+  };
+
+  const toggleCameraType = () => {
+    setType((current) =>
+      current === CameraType.back ? CameraType.front : CameraType.back
+    );
   };
 
   return (
     <View style={styles.container}>
-      <Camera style={styles.camera} ref={setCamera}>
+      <Camera style={styles.camera} ref={setCamera} type={type}>
         {photo && (
           <View style={styles.takePhotoContainer}>
             <Image
               source={{ uri: photo }}
-              style={{ height: 200, width: 200 }}
+              style={{ height: 100, width: 100, borderRadius: 8 }}
             />
           </View>
         )}
@@ -34,6 +44,10 @@ export default function CreatePostsScreen({ navigation }) {
             style={styles.icon}
             source={require("../images/camera.png")}
           ></Image>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.button} onPress={toggleCameraType}>
+          <Text style={styles.text}>Flip Camera</Text>
         </TouchableOpacity>
       </Camera>
       <View>
@@ -88,6 +102,7 @@ const styles = StyleSheet.create({
     left: 0,
     borderColor: "#fff",
     borderWidth: 1,
+    borderRadius: 8,
   },
   buttonSend: {
     backgroundColor: "#FF6C00",
@@ -103,5 +118,17 @@ const styles = StyleSheet.create({
   downLoadText: {
     fontSize: 16,
     color: "#BDBDBD",
+  },
+
+  button: {
+    // flex: 1,
+    marginTop: 10,
+    alignSelf: "flex-end",
+    alignItems: "center",
+  },
+  text: {
+    fontSize: 12,
+    fontWeight: "bold",
+    color: "white",
   },
 });
