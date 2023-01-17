@@ -1,12 +1,15 @@
-import db from "../../firebase/config";
+// import db from "../../firebase/config";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../firebase/config";
 
 export const authSighUpUser =
-  ({ email, password, login }) =>
+  ({ login, email, password }) =>
   async (dispatch, getState) => {
+    console.log("email", email);
+    console.log("password", password);
+    console.log("login", login);
     try {
-      const user = await db
-        .auth()
-        .createUserWithEmailAndPassword(email, password);
+      const user = await createUserWithEmailAndPassword(auth, email, password);
       console.log("user", user);
     } catch (error) {
       console.log("error", error);
@@ -15,5 +18,3 @@ export const authSighUpUser =
   };
 export const authSighInUser = () => async (dispatch, getState) => {};
 export const authSighOutUser = () => async (dispatch, getState) => {};
-
-// export { authSighInUser, authSighUpUser, authSighOutUser };
