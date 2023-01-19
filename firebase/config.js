@@ -1,18 +1,3 @@
-// import * as firebase from "firebase";
-// import "firebase/auth";
-
-// const firebaseConfig = {
-//   apiKey: "API_KEY",
-//   authDomain: "DOMAIN",
-//   databaseURL: "URL",
-//   projectId: "PROJECT_ID",
-//   storageBucket: "STORAGE",
-//   messagingSenderId: "SENDER_ID",
-//   appId: "APP_ID",
-// };
-
-// export default firebase.initializeApp(firebaseConfig);
-
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";

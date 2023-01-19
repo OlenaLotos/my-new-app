@@ -16,8 +16,7 @@ import {
 } from "react-native";
 
 import { useDispatch } from "react-redux";
-
-import { authSighUpUser } from "../redux/auth/authOperations";
+import { authSignUpUser } from "../redux/auth/authOperations";
 
 const initialState = {
   login: "",
@@ -47,7 +46,7 @@ export default function RegistrationScreen({ navigation }) {
   const handleSubmit = () => {
     setIsShowKeyboard(false);
     Keyboard.dismiss();
-    dispatch(authSighUpUser(state));
+    dispatch(authSignUpUser(state));
     setState(initialState);
   };
 

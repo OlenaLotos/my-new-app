@@ -4,6 +4,8 @@ import { Camera, CameraType } from "expo-camera";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import * as Location from "expo-location";
 import { Feather } from "@expo/vector-icons";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { db } from "../firebase/config";
 
 const initialState = {
   text: "",
@@ -33,6 +35,7 @@ export default function CreatePostsScreen({ navigation }) {
   };
 
   const sendPhoto = async () => {
+    uploadPhotoToServer();
     navigation.navigate("DefaultScreen", { photo });
     setState(initialState);
     setPhoto(null);
@@ -42,6 +45,19 @@ export default function CreatePostsScreen({ navigation }) {
     setType((current) =>
       current === CameraType.back ? CameraType.front : CameraType.back
     );
+  };
+
+  const uploadPhotoToServer = async () => {
+    const storage = getStorage();
+    const uniquePostId = Date.now().toString();
+    const storageRef = ref(storage, `images/${uniquePostId}`);
+
+    const response = await fetch(photo);
+    const file = await response.blob();
+
+    await uploadBytes(storageRef, file).then(() => {
+      console.log(`photo uploaded`);
+    });
   };
 
   return (

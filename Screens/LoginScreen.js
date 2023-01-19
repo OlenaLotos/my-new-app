@@ -15,16 +15,19 @@ import {
   Dimensions,
 } from "react-native";
 
+import { useDispatch } from "react-redux";
+import { authSignInUser } from "../redux/auth/authOperations";
 const initialState = {
   email: "",
   password: "",
 };
 
 export default function LoginScreen({ navigation }) {
-  console.log("navigation", navigation);
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [state, setState] = useState(initialState);
   const [dimensions, setDimensions] = useState(Dimensions.get("window").width);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const onChange = () => {
@@ -37,15 +40,15 @@ export default function LoginScreen({ navigation }) {
     };
   }, []);
 
-  const keyboardHide = () => {
+  const handleSubmit = () => {
     setIsShowKeyboard(false);
     Keyboard.dismiss();
-    console.log(state);
+    dispatch(authSignInUser(state));
     setState(initialState);
   };
 
   return (
-    <TouchableWithoutFeedback onPress={keyboardHide}>
+    <TouchableWithoutFeedback onPress={handleSubmit}>
       <ImageBackground
         style={styles.image}
         source={require("../images/backgraund.png")}
@@ -53,7 +56,7 @@ export default function LoginScreen({ navigation }) {
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
-          <TouchableWithoutFeedback onPress={keyboardHide}>
+          <TouchableWithoutFeedback onPress={handleSubmit}>
             <View
               style={{
                 ...styles.container,
@@ -93,7 +96,7 @@ export default function LoginScreen({ navigation }) {
                 }}
               >
                 <Button
-                  onPress={keyboardHide}
+                  onPress={handleSubmit}
                   style={styles.button}
                   color={"#fff"}
                   title="Увійти"
