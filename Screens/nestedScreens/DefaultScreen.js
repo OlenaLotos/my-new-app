@@ -1,10 +1,29 @@
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet, FlatList, Image, Button } from "react-native";
 // import { Feather } from "@expo/vector-icons";
+import { db } from "../../firebase/config";
+import {
+  collection,
+  onSnapshot,
+  query,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 
 export default function DefaultScreenPosts({ route, navigation }) {
   const [posts, setPosts] = useState([]);
-  //   console.log("route.params", route.params);
+
+  const getAllPosts = async () => {
+    const q = query(collection(db, "posts"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const posts = [];
+      querySnapshot.forEach((doc) => {
+        posts.push({ ...doc.data(), id: doc.id });
+      });
+      setPosts(posts);
+      return posts;
+    });
+  };
 
   useEffect(() => {
     if (route.params) {

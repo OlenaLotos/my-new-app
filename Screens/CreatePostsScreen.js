@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { View, Text, StyleSheet, Image, TextInput, Button } from "react-native";
 import { Camera, CameraType } from "expo-camera";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import * as Location from "expo-location";
 import { Feather } from "@expo/vector-icons";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { collection, addDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
 
 const initialState = {
@@ -19,24 +21,37 @@ export default function CreatePostsScreen({ navigation }) {
   const [photo, setPhoto] = useState("");
   const [type, setType] = useState(CameraType.back);
   const [location, setLocation] = useState(null);
+  const [comment, setComment] = useState("");
+
+  const { userId, login } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.log("Permission to access location was denied");
+      }
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+    })();
+  }, [photo]);
 
   const takePhoto = async () => {
-    const photo = await camera.takePictureAsync();
-    const location = await Location.getCurrentPositionAsync({});
+    // console.log("location", location);
+    // console.log("comment", comment);
+    const { uri } = await camera.takePictureAsync();
     const coords = {
       latitude: location.coords.latitude,
       longitude: location.coords.longitude,
     };
     setLocation(coords);
-    setPhoto(photo.uri);
-    setState((prevState) => ({ ...prevState, photo: photo.uri }));
-    // console.log("location", location.latitude);
-    // console.log(photo);
+    setPhoto(uri);
+    // setState((prevState) => ({ ...prevState, photo: uri }));
   };
 
   const sendPhoto = async () => {
-    uploadPhotoToServer();
-    navigation.navigate("DefaultScreen", { photo });
+    await uploadPostToServer();
+    navigation.navigate("DefaultScreen");
     setState(initialState);
     setPhoto(null);
   };
@@ -57,6 +72,54 @@ export default function CreatePostsScreen({ navigation }) {
 
     await uploadBytes(storageRef, file).then(() => {
       console.log(`photo uploaded`);
+    });
+
+    // const processedPhoto = await getDownloadURL(
+    //   ref(storage, `images/${uniquePostId}`)
+    // )
+    //   .then((url) => {
+    //     return url;
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
+    // return processedPhoto;
+
+    const processedPhoto = await getDownloadURL(storageRef).then((item) => {
+      return item;
+    });
+    return processedPhoto;
+  };
+
+  // const uploadPostToServer = async () => {
+  //   const photo = await uploadPhotoToServer();
+  //   const createPost = await db
+  //     .firestore()
+  //     .collection("posts")
+  //     .add({ photo, comment, location: location.coords, userId, login });
+  //   // try {
+  //   //   const setUserPost = await addDoc(collection(db, "posts"), {
+  //   //     photo,
+  //   //     comment,
+  //   //     location: location.coords,
+  //   //     userId,
+  //   //     login,
+  //   //   });
+  //   // } catch (error) {
+  //   //   console.error("Error adding document: ", error);
+  //   // }
+  // };
+
+  const uploadPostToServer = async () => {
+    const photo = await uploadPhotoToServer();
+    const createPost = await collection(db, "posts");
+
+    await addDoc(createPost, {
+      user: userId,
+      location: location.coords,
+      comment: comment,
+      photo: photo,
+      login: login,
     });
   };
 
@@ -90,11 +153,12 @@ export default function CreatePostsScreen({ navigation }) {
       </View>
       <TextInput
         style={styles.input}
-        value={state.text}
+        // value={state.text}
         placeholder="Назва..."
-        onChangeText={(value) =>
-          setState((prevState) => ({ ...prevState, text: value }))
-        }
+        onChangeText={setComment}
+        // onChangeText={(value) =>
+        //   setState((prevState) => ({ ...prevState, text: value }))
+        // }
       />
       <View style={{ position: "relative" }}>
         <View style={styles.location}>
