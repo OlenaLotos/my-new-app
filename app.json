@@ -1,7 +1,8 @@
 {
   "expo": {
-    "name": "my-new-app",
-    "slug": "my-new-app",
+    "name": "Posts App",
+    "slug": "posts-app",
+    "description": "This App helps you enjoj your posts",
     "version": "1.0.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
