@@ -20,7 +20,7 @@ import { collection, addDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
 
 const initialState = {
-  text: "",
+  comment: "",
   location: "",
   photo: "",
 };
@@ -34,7 +34,6 @@ export default function CreatePostsScreen({ navigation }) {
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
   const [textLocation, setTextLocation] = useState("");
-  // const [location, setLocation] = useState(null);
   const [comment, setComment] = useState("");
 
   const { userId, login } = useSelector((state) => state.auth);
@@ -46,29 +45,21 @@ export default function CreatePostsScreen({ navigation }) {
         console.log("Permission to access location was denied");
       }
       let location = await Location.getCurrentPositionAsync({});
-      // setLocation(location);
       setLatitude(location.coords.latitude);
       setLongitude(location.coords.longitude);
     })();
   }, [photo]);
 
   const takePhoto = async () => {
-    // console.log("location", location);
-    // console.log("comment", comment);
     const { uri } = await camera.takePictureAsync();
-    // const coords = {
-    //   latitude: location.coords.latitude,
-    //   longitude: location.coords.longitude,
-    // };
-    // setLocation(coords);
     setPhoto(uri);
-    // setState((prevState) => ({ ...prevState, photo: uri }));
   };
 
   const sendPhoto = async () => {
     await uploadPostToServer();
     navigation.navigate("DefaultScreen");
-    // setState(initialState);
+    deletePost();
+    setState(initialState);
     setPhoto(null);
     setIsShowKeyboard(false);
     Keyboard.dismiss();
@@ -97,41 +88,11 @@ export default function CreatePostsScreen({ navigation }) {
       console.log(`photo uploaded`);
     });
 
-    // const processedPhoto = await getDownloadURL(
-    //   ref(storage, `images/${uniquePostId}`)
-    // )
-    //   .then((url) => {
-    //     return url;
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
-    // return processedPhoto;
-
     const processedPhoto = await getDownloadURL(storageRef).then((item) => {
       return item;
     });
     return processedPhoto;
   };
-
-  // const uploadPostToServer = async () => {
-  //   const photo = await uploadPhotoToServer();
-  //   const createPost = await db
-  //     .firestore()
-  //     .collection("posts")
-  //     .add({ photo, comment, location: location.coords, userId, login });
-  //   // try {
-  //   //   const setUserPost = await addDoc(collection(db, "posts"), {
-  //   //     photo,
-  //   //     comment,
-  //   //     location: location.coords,
-  //   //     userId,
-  //   //     login,
-  //   //   });
-  //   // } catch (error) {
-  //   //   console.error("Error adding document: ", error);
-  //   // }
-  // };
 
   const uploadPostToServer = async () => {
     const photo = await uploadPhotoToServer();
@@ -139,14 +100,22 @@ export default function CreatePostsScreen({ navigation }) {
 
     await addDoc(createPost, {
       user: userId,
-      // location: location.coords,
       latitude: latitude,
       longitude: longitude,
       textLocation: textLocation,
       comment: comment,
       photo: photo,
       login: login,
+      like: 0,
     });
+  };
+
+  const deletePost = () => {
+    setPhoto("");
+    setComment("");
+    setLatitude(null);
+    setLongitude(null);
+    setTextLocation("");
   };
 
   return (
@@ -173,23 +142,13 @@ export default function CreatePostsScreen({ navigation }) {
               <Text style={styles.textFlip}>Flip Camera</Text>
             </TouchableOpacity>
           </Camera>
-          {/* <View>
-            <TextInput
-              style={{ fontSize: 16, paddingTop: 8, paddingBottom: 48 }}
-              placeholder="Завантажити фото"
-            />
-          </View> */}
           <TextInput
             style={styles.input}
-            // value={state.text}
             placeholder="Назва..."
             onFocus={() => {
               setIsShowKeyboard(true);
             }}
             onChangeText={(value) => setComment(value)}
-            // onChangeText={(value) =>
-            //   setState((prevState) => ({ ...prevState, text: value }))
-            // }
           />
           <View style={{ position: "relative" }}>
             <View style={styles.location}>
@@ -208,7 +167,6 @@ export default function CreatePostsScreen({ navigation }) {
           <View style={styles.buttonSend}>
             <Button
               onPress={sendPhoto}
-              // style={styles.buttonSend}
               color={"#fff"}
               backgroundColor={"#FF6C00"}
               title="Опублікувати"
@@ -216,10 +174,7 @@ export default function CreatePostsScreen({ navigation }) {
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
-      <TouchableOpacity
-        // onFocus={() => setPhoto(null)}
-        style={styles.deleteButton}
-      >
+      <TouchableOpacity onPress={deletePost} style={styles.deleteButton}>
         <Feather name="trash-2" size={24} color="#DADADA" />
       </TouchableOpacity>
     </View>
@@ -230,14 +185,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginHorizontal: 16,
-    // justifyContent: "center",
-    // alignItems: "center",
   },
   camera: {
     height: 240,
     marginTop: 32,
     backgroundColor: "#F6F6F6",
-    // borderColor: "#E8E8E8",
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
@@ -251,9 +203,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     borderWidth: 1,
   },
-  icon: {
-    // top: 18,
-  },
+
   takePhotoContainer: {
     position: "absolute",
     top: 0,
@@ -277,7 +227,6 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    // flex: 1,
     marginTop: 10,
     alignSelf: "flex-end",
     alignItems: "center",
@@ -292,7 +241,6 @@ const styles = StyleSheet.create({
     borderColor: "#E8E8E8",
     borderBottomWidth: 1,
     marginBottom: 16,
-    // fontWeight: 400,
     fontSize: 16,
     lineHeight: 19,
   },
@@ -305,13 +253,11 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   locationText: {
-    // fontWeight: 400,
     fontSize: 16,
     lineHeight: 19,
     marginLeft: 8,
   },
   deleteButton: {
-    // bottom: 22,
     marginTop: 120,
     position: "absolute",
     justifyContent: "center",
