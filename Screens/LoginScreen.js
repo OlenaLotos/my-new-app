@@ -81,7 +81,7 @@ export default function LoginScreen({ navigation }) {
                 style={{ ...styles.input, width: dimensions < 500 ? 343 : 543 }}
                 value={state.password}
                 placeholder="Пароль"
-                secureTextEntry={"true"}
+                secureTextEntry={true}
                 onFocus={() => {
                   setIsShowKeyboard(true);
                 }}

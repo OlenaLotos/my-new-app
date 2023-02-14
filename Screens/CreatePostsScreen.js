@@ -10,9 +10,9 @@ import {
   TouchableWithoutFeedback,
   KeyboardAvoidingView,
   Keyboard,
+  TouchableOpacity,
 } from "react-native";
 import { Camera, CameraType } from "expo-camera";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import * as Location from "expo-location";
 import { Feather } from "@expo/vector-icons";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -35,6 +35,7 @@ export default function CreatePostsScreen({ navigation }) {
   const [longitude, setLongitude] = useState(null);
   const [textLocation, setTextLocation] = useState("");
   const [comment, setComment] = useState("");
+  // const [isCameraReady, setIsCameraReady] = useState(false);
 
   const { userId, login } = useSelector((state) => state.auth);
 
@@ -50,16 +51,21 @@ export default function CreatePostsScreen({ navigation }) {
     })();
   }, [photo]);
 
+  // const onCameraReady = () => {
+  //   setIsCameraReady(true);
+  // };
+
   const takePhoto = async () => {
-    const { uri } = await camera.takePictureAsync();
-    setPhoto(uri);
+    const photo = await camera.takePictureAsync();
+    setPhoto(photo.uri);
+    console.log("camera", photo.uri);
   };
 
   const sendPhoto = async () => {
     await uploadPostToServer();
     navigation.navigate("DefaultScreen");
-    deletePost();
-    setState(initialState);
+    // deletePost();
+    // setState(initialState);
     setPhoto(null);
     setIsShowKeyboard(false);
     Keyboard.dismiss();
@@ -110,19 +116,24 @@ export default function CreatePostsScreen({ navigation }) {
     });
   };
 
-  const deletePost = () => {
-    setPhoto("");
-    setComment("");
-    setLatitude(null);
-    setLongitude(null);
-    setTextLocation("");
-  };
+  // const deletePost = () => {
+  //   setPhoto("");
+  //   setComment("");
+  //   setLatitude(null);
+  //   setLongitude(null);
+  //   setTextLocation("");
+  // };
 
   return (
     <View style={styles.container}>
       <TouchableWithoutFeedback onPress={keyboardHide}>
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : ""}>
-          <Camera style={styles.camera} ref={setCamera} type={type}>
+          <Camera
+            style={styles.camera}
+            ref={setCamera}
+            type={type}
+            // onCameraReady={onCameraReady}
+          >
             {photo && (
               <View style={styles.takePhotoContainer}>
                 <Image
@@ -174,9 +185,9 @@ export default function CreatePostsScreen({ navigation }) {
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
-      <TouchableOpacity onPress={deletePost} style={styles.deleteButton}>
+      {/* <TouchableOpacity onPress={deletePost} style={styles.deleteButton}>
         <Feather name="trash-2" size={24} color="#DADADA" />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 }
@@ -188,7 +199,7 @@ const styles = StyleSheet.create({
   },
   camera: {
     height: 240,
-    marginTop: 32,
+    marginTop: 40,
     backgroundColor: "#F6F6F6",
     borderRadius: 8,
     justifyContent: "center",
@@ -227,8 +238,8 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    marginTop: 10,
-    alignSelf: "flex-end",
+    marginTop: 20,
+    // alignSelf: "flex-end",
     alignItems: "center",
   },
   textFlip: {
@@ -258,7 +269,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   deleteButton: {
-    marginTop: 120,
+    marginTop: 620,
     position: "absolute",
     justifyContent: "center",
     alignSelf: "center",
